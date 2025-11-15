@@ -46,12 +46,12 @@ jobs:
             ${{ runner.os }}-buildx-
 
       # Paso 6: Construir y Push de la imagen Docker
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .  # El directorio de trabajo para construir la imagen Docker
-          push: false  # Sube la imagen a Docker Hub
-          tags: yourusername/your-repo-name:latest  # Etiqueta la imagen como latest en Docker Hub
+      #- name: Build and push Docker image
+      #  uses: docker/build-push-action@v2
+      #  with:
+      #    context: .  # El directorio de trabajo para construir la imagen Docker
+      #    push: false  # Sube la imagen a Docker Hub
+      #    tags: yourusername/your-repo-name:latest  # Etiqueta la imagen como latest en Docker Hub
 
       # Paso 7: Conectar a EC2 y desplegar la imagen Docker usando Docker Compose
       - name: Deploy to EC2

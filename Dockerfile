@@ -3,9 +3,11 @@ FROM node:22-alpine
 ENV DIR /app-express
 WORKDIR $DIR 
 
-COPY . .
+COPY package*.json ./
 
 RUN npm install
+
+COPY . .
 
 RUN npm run build
 
