@@ -72,6 +72,8 @@ jobs:
             cd /home/ec2-user/fullstack-express/backend-express-auth/
             # Actualiza los contenedores con Docker Compose
             #docker-compose pull  # Trae la última imagen desde Docker Hub
-            docker-compose down  # Apaga y elimina los contenedores antiguos
-            docker-compose build --no-cache  # Reconstruye las imágenes según el Dockerfile
-            docker-compose up -d  # Levanta los nuevos contenedores en modo detached (en segundo plano)
+            docker-compose down --volumes --remove-orphans
+            docker image prune -a
+            docker-compose build --no-cache
+            docker-compose up -d
+            docker-compose logs -f
