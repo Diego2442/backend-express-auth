@@ -62,6 +62,12 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}  # La clave privada de tu EC2 (asegúrate de configurarla como secreto)
           port: 22  # Puerto SSH por defecto
           script: |
+            #Exporta las variables de entorno
+            export NODE_ENV=production
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export DATABASE_URL=${{ secrets.DATABASE_URL }}
+            export FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+
             # Ve al directorio del proyecto en la EC2
             cd /home/ec2-user/fullstack-express/backend-express-auth/
             # Actualiza los contenedores con Docker Compose
