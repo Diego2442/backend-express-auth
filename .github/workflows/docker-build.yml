@@ -1,0 +1,71 @@
+name: Build and Analyze with SonarQube
+
+on:
+  push:
+    branches:
+      - main  # Este flujo se ejecutará solo cuando se haga push a la rama main
+
+jobs:
+  build_and_analyze:
+    name: Build, Analyze, and Deploy Docker Container
+    runs-on: ubuntu-latest  # La acción se ejecutará en un runner de Ubuntu
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Deshabilita clones superficiales para un análisis más relevante
+
+      # Paso 2: Ejecutar el análisis de SonarQube
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Asegúrate de tener este secreto configurado
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # Asegúrate de tener este secreto configurado
+
+      # (Opcional) Paso 3: Failing si Quality Gate de SonarQube no pasa
+      # Si deseas que el flujo de trabajo falle si SonarQube encuentra problemas
+      - name: Wait for Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Paso 4: Configurar Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Paso 5: Cache de capas Docker (para acelerar las construcciones posteriores)
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # Paso 6: Construir y Push de la imagen Docker
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .  # El directorio de trabajo para construir la imagen Docker
+          push: false  # Sube la imagen a Docker Hub
+          tags: yourusername/your-repo-name:latest  # Etiqueta la imagen como latest en Docker Hub
+
+      # Paso 7: Conectar a EC2 y desplegar la imagen Docker usando Docker Compose
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}  # Dirección IP pública de tu EC2
+          username: ${{ secrets.EC2_USER }}  # Usuario de la instancia EC2 (ej. ec2-user, ubuntu)
+          key: ${{ secrets.EC2_PRIVATE_KEY }}  # La clave privada de tu EC2 (asegúrate de configurarla como secreto)
+          port: 22  # Puerto SSH por defecto
+          script: |
+            # Ve al directorio del proyecto en la EC2
+            cd /home/ec2-user/fullstack-express/backend-express-auth/
+            # Actualiza los contenedores con Docker Compose
+            #docker-compose pull  # Trae la última imagen desde Docker Hub
+            docker-compose down  # Apaga y elimina los contenedores antiguos
+            docker-compose build --no-cache  # Reconstruye las imágenes según el Dockerfile
+            docker-compose up -d  # Levanta los nuevos contenedores en modo detached (en segundo plano)

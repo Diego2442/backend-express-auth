@@ -1,0 +1,12 @@
+
+services:
+  
+  my-web-backend:
+    container_name: my-web
+    restart: unless-stopped
+    build:
+      context: .
+    ports:
+      - "4000:4000"
+    env_file: .env
+    
