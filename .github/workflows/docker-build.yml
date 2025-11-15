@@ -13,7 +13,7 @@ jobs:
     steps:
       # Paso 1: Checkout del código
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Deshabilita clones superficiales para un análisis más relevante
 
@@ -38,7 +38,7 @@ jobs:
 
       # Paso 5: Cache de capas Docker (para acelerar las construcciones posteriores)
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
