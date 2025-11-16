@@ -43,10 +43,11 @@ FRONTEND_URL=http://localhost:3000
 ```
 
 # Ejecutar docker-compose
-    ```
+    
+
     docker-compose build
     docker-compose up
-    ```
+    
 
 # Workflow de GitHub Actions: Construcción y Despliegue con SonarQube y Docker
 
