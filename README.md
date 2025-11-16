@@ -43,7 +43,7 @@ FRONTEND_URL=http://localhost:3000
 ```
 
 # Ejecutar docker-compose
-    ```bash
+    ```
     docker-compose build
     docker-compose up
     ```
